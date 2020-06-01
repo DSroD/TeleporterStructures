@@ -1,0 +1,6 @@
+name: TeleportStructures
+version: ${project.version}
+main: cz.cuni.mff.rodd.teleportstructures.Teleportstructures
+api-version: 1.13
+authors: [rodd]
+description: Teleporter structures
