@@ -1,0 +1,32 @@
+configVersion: 1
+
+#Max distance before applying modifiers
+maxDistance: 2000
+
+#Cost per block traveled before applying modifiers
+#Cost is always rounded up to nearest integer
+costPerBlockTraveled: 1
+
+blockModifiers:
+  IRON_BLOCK:
+    cost: 1
+    distance: 1.32
+  EMERALD_BLOCK:
+    cost: 0.5
+    distance: 4
+  GOLDEN_BLOCK:
+    cost: 0.8
+    distance: 6
+  DIAMOND_BLOCK:
+    cost: 0.8
+    distance: 12
+
+fuel:
+  IRON_INGOT:
+    fuelValue: 500
+  EMERALD:
+    fuelValue: 2500
+  GOLD_INGOT:
+    fuelValue: 6000
+  DIAMOND:
+    fuelValue: 14000
