@@ -9,7 +9,8 @@ import java.util.logging.Level;
 
 public class ConfigUtils {
 
-    public static void loadMainConfig(MainConfig config, TeleportStructures plugin) {
+    public static void loadMainConfig(TeleportStructures plugin) {
+        MainConfig config = plugin.getMainConfig();
         //TODO: Check config version against MainConfig static field one, if
         //      versions doesn't check out create backup of config and create default
 
@@ -26,11 +27,13 @@ public class ConfigUtils {
 
         //Load Block Modifiers
         for (String strmat : plugin.getConfig().getConfigurationSection("blockModifiers").getKeys(false)) {
+            if (strmat == null) break; //Is this appropriate NPE check in this case?
+
             Material mat = Material.getMaterial(strmat);
             if (mat == null) {
                 plugin.getLogger().log(Level.WARNING, "Wrong material " + strmat + " at blockModifiers" +
                         " section in TeleportStructures config.yml!");
-                continue; //BREAK THE WHEEL but don't obviously.
+                continue; //BREAK THE WHEEL but don't obviously. Continue the wheel wouldn't sound so good.
             }
             if (plugin.getConfig().isDouble("blockModifiers." + strmat + ".cost")) //Add Cost Modifier
                 config.addCostModifier(mat, plugin.getConfig().getDouble("blockModifiers." + strmat + ".cost"));
@@ -42,12 +45,17 @@ public class ConfigUtils {
         }
 
         //Load Fuels
+        //This part of code is repeated code. I even repeated comments.
+        //I'm so glad this isn't python and I don't have my IDE screaming at me.
+        //Now I wish for plugins in python. Fuck. Does that mean I enjoy being screamed at?
         for (String strmat : plugin.getConfig().getConfigurationSection("fuel").getKeys(false)) {
+            if (strmat == null) break; //Is this appropriate NPE check in this case?
+
             Material mat = Material.getMaterial(strmat);
             if (mat == null) {
                 plugin.getLogger().log(Level.WARNING, "Wrong material " + strmat + " at fuel" +
                         " section in TeleportStructures config.yml!");
-                continue; //BREAK THE WHEEL but don't obviously.
+                continue; //BREAK THE WHEEL but don't obviously. Continue the wheel wouldn't sound so good.
             }
             if (plugin.getConfig().isInt("fuel." + strmat + ".fuelValue"))
                 config.addFuel(mat, plugin.getConfig().getInt("fuel." + strmat + ".fuelValue"));
@@ -56,7 +64,9 @@ public class ConfigUtils {
     }
 
     public static void saveConfiguration(MainConfig config, TeleportStructures plugin) {
-        //TODO: HAHA I should definetly call this asap!
+        //HAHA I should definetly call this asap!
+        //      Really this method is not needed yet as there is no means of changing config values programatically,
+        //      I will keep this here just for the sake of completeness and add functionality when needed
         throw new NotImplementedException();
     }
 

@@ -20,7 +20,7 @@ public class PlayerSneakHandler implements Listener {
     public void onPlayerToggleSneakEvent(PlayerToggleSneakEvent event) {
         Player player = event.getPlayer();
         Location location = player.getLocation();
-        //TODO: Check if player stands on portal
+        //TODO: Check if player stands on portal (or near one)
 
         //TODO: Open GUI with group-linked portals (link only two-way possible portals - if player teleports somewhere
         //      portal there HAS to be able to teleport him back, this makes system more interesting and encourages
