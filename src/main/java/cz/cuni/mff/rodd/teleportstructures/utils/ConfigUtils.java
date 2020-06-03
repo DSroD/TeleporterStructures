@@ -17,7 +17,7 @@ public class ConfigUtils {
         if (plugin.getConfig().getInt("configVersion") != MainConfig.configVersion)
             plugin.getLogger().log(Level.WARNING, "Wrong configuration version detected!");
 
-        //TODO: Solution above should be temporary as the right solution is to programatically
+        //TODO: Solution above should be temporary as the right solution is to programmatically
         //      set default configuration values and copy defaults if they don't exist in old config.
         //      Configuration values are to be deprecated at least over several config versions.
 
@@ -57,15 +57,15 @@ public class ConfigUtils {
                         " section in TeleportStructures config.yml!");
                 continue; //BREAK THE WHEEL but don't obviously. Continue the wheel wouldn't sound so good.
             }
-            if (plugin.getConfig().isInt("fuel." + strmat + ".fuelValue"))
+            if (plugin.getConfig().isInt("fuel." + strmat + ".fuelValue")) //Add fuel
                 config.addFuel(mat, plugin.getConfig().getInt("fuel." + strmat + ".fuelValue"));
         }
 
     }
 
     public static void saveConfiguration(MainConfig config, TeleportStructures plugin) {
-        //HAHA I should definetly call this asap!
-        //      Really this method is not needed yet as there is no means of changing config values programatically,
+        //HAHA I should definetly call this ASAP!
+        //      Really this method is not needed yet as there is no means of changing config values programmatically,
         //      I will keep this here just for the sake of completeness and add functionality when needed
         throw new NotImplementedException();
     }

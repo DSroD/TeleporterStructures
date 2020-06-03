@@ -1,6 +1,7 @@
 package cz.cuni.mff.rodd.teleportstructures;
 
 import cz.cuni.mff.rodd.teleportstructures.config.MainConfig;
+import cz.cuni.mff.rodd.teleportstructures.storage.TeleporterData;
 import cz.cuni.mff.rodd.teleportstructures.teleports.TeleportGroup;
 import cz.cuni.mff.rodd.teleportstructures.utils.ConfigUtils;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -12,7 +13,7 @@ public final class TeleportStructures extends JavaPlugin {
 
     private MainConfig _pluginConfig;
 
-    private List<TeleportGroup> _teleportGroups;
+    private TeleporterData _teleportData;
 
     @Override
     public void onEnable() {
@@ -22,8 +23,9 @@ public final class TeleportStructures extends JavaPlugin {
         _pluginConfig = new MainConfig(this);
         ConfigUtils.loadMainConfig(this);
 
-        //Initialize array of teleport groups
-        _teleportGroups = new ArrayList<>();
+        //Initialize teleporter data
+        _teleportData = new TeleporterData(this);
+        _teleportData.loadTeleporterDataFromFile();
 
     }
 
