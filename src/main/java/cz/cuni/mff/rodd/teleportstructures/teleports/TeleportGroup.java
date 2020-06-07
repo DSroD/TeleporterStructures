@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 
+import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -51,6 +52,30 @@ public class TeleportGroup {
 
     public boolean isTeleportInGroup(String teleportername) {
         return _teleports.stream().anyMatch(x -> x.getName().equals(teleportername));
+    }
+
+    public boolean removeTeleport(Teleport t) {
+        return _teleports.remove(t);
+    }
+
+    public boolean removeTeleport(String teleportName) {
+        for(Teleport t : _teleports) {
+            if(t.getName().equals(teleportName)) {
+                _teleports.remove(t);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Nullable
+    public Teleport getTeleport(String teleportName) {
+        for (Teleport t : _teleports) {
+            if(t.getName().equals(teleportName)) {
+                return t;
+            }
+        }
+        return null;
     }
 
 }

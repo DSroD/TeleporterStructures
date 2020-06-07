@@ -3,6 +3,8 @@ package cz.cuni.mff.rodd.teleportstructures.storage;
 import cz.cuni.mff.rodd.teleportstructures.TeleportStructures;
 import cz.cuni.mff.rodd.teleportstructures.teleports.Teleport;
 import cz.cuni.mff.rodd.teleportstructures.teleports.TeleportGroup;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
@@ -46,12 +48,25 @@ public class TeleporterData {
 
     public void loadTeleporterDataFromFile() {
         _data = YamlConfiguration.loadConfiguration(_dataFile);
-        //TODO: Load teleport groups and teleports to hash map for faster access
-
+        for(String groupSection : _data.getConfigurationSection("groups").getKeys(false)) { //Loop through groups
+            TeleportGroup g = new TeleportGroup(groupSection, UUID.fromString(_data.getString("group."+groupSection+".owner")));
+            _teleportGroups.put(groupSection, g);
+            for(String teleport : _data.getConfigurationSection("groups."+groupSection+".teleports").getKeys(false)) { //Loop through teleports in group
+                Teleport t = new Teleport(
+                        new Location(
+                            Bukkit.getWorld(UUID.fromString(_data.getString("groups."+groupSection+".teleports." + teleport + ".world"))),
+                            _data.getInt("groups."+groupSection+".teleports." + teleport + ".x"),
+                            _data.getInt("groups."+groupSection+".teleports." + teleport + ".y"),
+                            _data.getInt("groups."+groupSection+".teleports." + teleport + ".z")),
+                        _data.getString("groups."+groupSection+".teleports." + teleport),
+                        _data.getString("groups."+groupSection),
+                        _data.getInt("groups."+groupSection+".teleports." + teleport + ".fuel"));
+                g.addTeleport(t);
+            }
+        }
     }
 
     public void saveTeleporterDataToFile() {
-        //TODO: Add checks for empty groups and delete them
         try {
             _data.save(_dataFile);
         } catch (IOException e) {
@@ -60,11 +75,20 @@ public class TeleporterData {
 
     }
 
-    public boolean createTeleport(Teleport t, UUID owner) {
+    public void setFuel(String groupName, String teleportName, int newFuel) //Call this on any fuel change event
+    {
+        Teleport t = _teleportGroups.get(groupName).getTeleport(teleportName);
+        if(t == null) return;
+        t.setFuel(newFuel);
+        _data.set("groups." + t.getTeleportGroupName() + ".teleports." + t.getName() + ".fuel", newFuel);
+    }
+
+    public boolean createTeleport(Location l, String name, String groupName, UUID owner) {
         /**
          * This is called when player creates teleport ingame, structure passes all checks and newly created Teleport object
          * is passed here
          */
+        Teleport t = new Teleport(l, name, groupName, 0);
         if(!_teleportGroups.containsKey(t.getTeleportGroupName())) {
             createGroup(t.getTeleportGroupName(), owner);
         }
@@ -72,9 +96,11 @@ public class TeleporterData {
         if(g.getOwnerUUID() == owner) {
             g.addTeleport(t);
             _data.createSection("groups." + g.getGroupName() + ".teleports." + t.getName());
-            _data.set("groups." + g.getGroupName() + ".teleports + " + t.getName() + ".x", t.getLocation().getBlockX());
-            _data.set("groups." + g.getGroupName() + ".teleports + " + t.getName() + ".y", t.getLocation().getBlockY());
-            _data.set("groups." + g.getGroupName() + ".teleports + " + t.getName() + ".z", t.getLocation().getBlockZ());
+            _data.set("groups." + g.getGroupName() + ".teleports." + t.getName() + ".x", t.getLocation().getBlockX());
+            _data.set("groups." + g.getGroupName() + ".teleports." + t.getName() + ".y", t.getLocation().getBlockY());
+            _data.set("groups." + g.getGroupName() + ".teleports." + t.getName() + ".z", t.getLocation().getBlockZ());
+            _data.set("groups." + g.getGroupName() + ".teleports." + t.getName() + ".world", t.getLocation().getWorld().getUID().toString());
+            _data.set("groups." + g.getGroupName() + ".teleports." + t.getName() + ".fuel", 0);
             return true;
         }
         return false;
@@ -89,10 +115,24 @@ public class TeleporterData {
         return true;
     }
 
+    public boolean removeTeleport(String groupName, String teleportName) {
+        _data.set("groups." + groupName + ".teleports." + teleportName, null);
+        if(_teleportGroups.get(groupName).getTeleports().size() == 1) { //TODO: Add null check here haha
+            _data.set("groups." + groupName, null);
+            return _teleportGroups.remove(groupName) != null;
+        }
+        return _teleportGroups.get(groupName).removeTeleport(teleportName);
+    }
+
+    //I don't even know why would I have this method overload but whatever...
     public boolean removeTeleport(Teleport t) {
-        //TODO: Remove teleport from both HashMap and datafile (empty group check could also be here - deletion is
-        //      probably not as frequent as saving.
-        throw new NotImplementedException();
+        _data.set("groups." + t.getTeleportGroupName() + ".teleports." + t.getName(), null);
+        if(_teleportGroups.get(t.getTeleportGroupName()).getTeleports().size() == 1) { //TODO: Add null check here haha
+            //This is last remaining teleporter
+            _data.set("groups." + t.getTeleportGroupName(), null);
+            return _teleportGroups.remove(t.getTeleportGroupName()) != null;
+        }
+        return _teleportGroups.get(t.getTeleportGroupName()).removeTeleport(t);
 
     }
 
