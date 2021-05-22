@@ -4,3 +4,6 @@ main: cz.cuni.mff.rodd.teleportstructures.Teleportstructures
 api-version: 1.13
 authors: [rodd]
 description: Teleporter structures
+permissions:
+  teleportstructures.breaksign:
+    default: op
