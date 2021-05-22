@@ -1,0 +1,6 @@
+/target/
+/target/*
+TeleporterStructures.jar
+.project
+.settings/
+.classpath

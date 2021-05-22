@@ -13,7 +13,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
+
+import javax.annotation.Nullable;
 
 public class TeleporterData {
     //TODO: This class will be used to save and load teleporter groups.
@@ -22,6 +25,7 @@ public class TeleporterData {
     TeleportStructures _plugin;
 
     private Map<String, TeleportGroup> _teleportGroups;
+    private Map<String, Teleport> _teleports;
 
     private FileConfiguration _data = null;
     private File _dataFile = null;
@@ -30,7 +34,8 @@ public class TeleporterData {
         _plugin = plugin;
 
         //Initialize teleport HashMap
-        _teleportGroups = new HashMap();
+        _teleportGroups = new HashMap<>();
+        _teleports = new HashMap<>();
 
         //Initialize (and create) data file
         if(_dataFile == null) {
@@ -52,15 +57,14 @@ public class TeleporterData {
             TeleportGroup g = new TeleportGroup(groupSection, UUID.fromString(_data.getString("group."+groupSection+".owner")));
             _teleportGroups.put(groupSection, g);
             for(String teleport : _data.getConfigurationSection("groups."+groupSection+".teleports").getKeys(false)) { //Loop through teleports in group
-                Teleport t = new Teleport(
+                Teleport t = new Teleport(_plugin,
                         new Location(
                             Bukkit.getWorld(UUID.fromString(_data.getString("groups."+groupSection+".teleports." + teleport + ".world"))),
                             _data.getInt("groups."+groupSection+".teleports." + teleport + ".x"),
                             _data.getInt("groups."+groupSection+".teleports." + teleport + ".y"),
                             _data.getInt("groups."+groupSection+".teleports." + teleport + ".z")),
                         _data.getString("groups."+groupSection+".teleports." + teleport),
-                        _data.getString("groups."+groupSection),
-                        _data.getInt("groups."+groupSection+".teleports." + teleport + ".fuel"));
+                        g);
                 g.addTeleport(t);
             }
         }
@@ -80,7 +84,7 @@ public class TeleporterData {
         Teleport t = _teleportGroups.get(groupName).getTeleport(teleportName);
         if(t == null) return;
         t.setFuel(newFuel);
-        _data.set("groups." + t.getTeleportGroupName() + ".teleports." + t.getName() + ".fuel", newFuel);
+        _data.set("groups." + t.getTeleportGroup().getGroupName() + ".teleports." + t.getName() + ".fuel", newFuel);
     }
 
     public boolean createTeleport(Location l, String name, String groupName, UUID owner) {
@@ -88,11 +92,12 @@ public class TeleporterData {
          * This is called when player creates teleport ingame, structure passes all checks and newly created Teleport object
          * is passed here
          */
-        Teleport t = new Teleport(l, name, groupName, 0);
-        if(!_teleportGroups.containsKey(t.getTeleportGroupName())) {
-            createGroup(t.getTeleportGroupName(), owner);
-        }
-        TeleportGroup g = _teleportGroups.get(t.getTeleportGroupName());
+
+        createGroup(groupName, owner);
+        
+        TeleportGroup g = _teleportGroups.get(groupName);
+        Teleport t = new Teleport(_plugin, l, name, g);
+        
         if(g.getOwnerUUID() == owner) {
             g.addTeleport(t);
             _data.createSection("groups." + g.getGroupName() + ".teleports." + t.getName());
@@ -115,24 +120,54 @@ public class TeleporterData {
         return true;
     }
 
+    public boolean isTeleport(String name) {
+        return _teleports.containsKey(name);
+    }
+
+    public TeleportGroup getOrCreateTeleportGroup(String name, UUID owner) {
+        if(_teleportGroups.containsKey(name)) return _teleportGroups.get(name);
+
+        _teleportGroups.put(name, new TeleportGroup(name, owner));
+        _data.createSection("groups." + name);
+        _data.set("groups." + name + ".owner", owner.toString());
+        _data.createSection("groups." + name + ".teleports");
+        return _teleportGroups.get(name);
+    }
+
     public boolean removeTeleport(String groupName, String teleportName) {
         _data.set("groups." + groupName + ".teleports." + teleportName, null);
-        if(_teleportGroups.get(groupName).getTeleports().size() == 1) { //TODO: Add null check here haha
+        if(!_teleportGroups.containsKey(groupName)) {return false;}
+        Teleport t = _teleportGroups.get(groupName).getTeleport(teleportName);
+        if(t == null) {return false;}
+        _plugin.underigsterEvents(t.getTeleporterMenu().getFuelMenu());
+        _plugin.underigsterEvents(t.getTeleporterMenu());
+        if(_teleportGroups.get(groupName).getTeleports().size() <= 1) {
             _data.set("groups." + groupName, null);
             return _teleportGroups.remove(groupName) != null;
         }
+
         return _teleportGroups.get(groupName).removeTeleport(teleportName);
     }
 
-    //I don't even know why would I have this method overload but whatever...
+    @Nullable
+    public Teleport getTeleportOnLocation(Location loc) {
+        final Optional<Teleport> n = _teleports.values().stream().filter((el) -> {
+            return  (Math.abs(loc.getBlockX() - el.getLocation().getBlockX()) < 4) &&
+                    ((loc.getBlockY() - el.getLocation().getBlockY()) < 4) &&
+                    (Math.abs(loc.getBlockZ() - el.getLocation().getBlockZ()) < 4);
+        }).findFirst();
+        return (n.isPresent()) ? n.get() : null;
+    }
+
+    
     public boolean removeTeleport(Teleport t) {
-        _data.set("groups." + t.getTeleportGroupName() + ".teleports." + t.getName(), null);
-        if(_teleportGroups.get(t.getTeleportGroupName()).getTeleports().size() == 1) { //TODO: Add null check here haha
+        _data.set("groups." + t.getTeleportGroup().getGroupName() + ".teleports." + t.getName(), null);
+        if(t.getTeleportGroup().getTeleports().size() == 1) {
             //This is last remaining teleporter
-            _data.set("groups." + t.getTeleportGroupName(), null);
-            return _teleportGroups.remove(t.getTeleportGroupName()) != null;
+            _data.set("groups." + t.getTeleportGroup().getGroupName(), null);
+            return _teleportGroups.remove(t.getTeleportGroup().getGroupName()) != null;
         }
-        return _teleportGroups.get(t.getTeleportGroupName()).removeTeleport(t);
+        return t.getTeleportGroup().removeTeleport(t);
 
     }
 

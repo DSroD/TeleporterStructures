@@ -22,8 +22,9 @@ public class ConfigUtils {
         //      Configuration values are to be deprecated at least over several config versions.
 
         //Load basic numerical values
-        config.setMaxDistance(plugin.getConfig().getInt("maxDistance"));
+        config.setBaseMaxDistance(plugin.getConfig().getInt("maxDistance"));
         config.setCostPerBlockTraveled(plugin.getConfig().getInt("costPerBlockTraveled"));
+        config.setBaseMaxFuel(plugin.getConfig().getInt("baseMaxFuel"));
 
         //Load Block Modifiers
         for (String strmat : plugin.getConfig().getConfigurationSection("blockModifiers").getKeys(false)) {
@@ -42,6 +43,29 @@ public class ConfigUtils {
                 config.addDistanceModifiers(mat, plugin.getConfig().getDouble("blockModifiers." + strmat
                         + ".distance"));
 
+        }
+
+        //Load Structure blocks
+        for(String strmat : plugin.getConfig().getStringList("constructionBlocks")) {
+            if (strmat == null) break;
+            Material mat = Material.getMaterial(strmat);
+            if(mat == null) {
+                plugin.getLogger().log(Level.WARNING, "Wrong material " + strmat + " at constructionBlocks" +
+                        " section in TeleportStructures config.yml!");
+                continue;
+            }
+            config.addStructureBlock(mat);
+        }
+
+        for(String strmat : plugin.getConfig().getStringList("secondaryConstructionBlocks")) {
+            if (strmat == null) break;
+            Material mat = Material.getMaterial(strmat);
+            if(mat == null) {
+                plugin.getLogger().log(Level.WARNING, "Wrong material " + strmat + " at secondaryConstructionBlocks" +
+                        " section in TeleportStructures config.yml!");
+                continue;
+            }
+            config.addSecondaryStructureBlock(mat);
         }
 
         //Load Fuels

@@ -1,6 +1,8 @@
 package cz.cuni.mff.rodd.teleportstructures.handlers;
 
 import cz.cuni.mff.rodd.teleportstructures.TeleportStructures;
+import cz.cuni.mff.rodd.teleportstructures.teleports.Teleport;
+
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -18,9 +20,12 @@ public class PlayerSneakHandler implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled=true)
     public void onPlayerToggleSneakEvent(PlayerToggleSneakEvent event) {
+        if (event.isSneaking()) return;
         Player player = event.getPlayer();
-        Location location = player.getLocation();
-        //TODO: Check if player stands on portal (or near one)
+        Teleport t = _plugin.getTeleporterData().getTeleportOnLocation(player.getLocation());
+        if(t == null) return;
+
+        t.getTeleporterMenu().openInventory(player);
 
         //TODO: Open GUI with group-linked portals (link only two-way possible portals - if player teleports somewhere
         //      portal there HAS to be able to teleport him back, this makes system more interesting and encourages
