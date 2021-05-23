@@ -53,7 +53,11 @@ public class TeleporterMenu implements Listener {
         meta.setDisplayName("Fuel");
         final StringBuilder lr1 = new StringBuilder("Current fuel: ").append(_source.getFuel());
         final StringBuilder lr2 = new StringBuilder("Max fuel: ").append(_plugin.getMainConfig().getBaseMaxFuel());
-        meta.setLore(Arrays.asList(lr1.toString(), lr2.toString()));
+        final StringBuilder lr3 = new StringBuilder("Cost modifier: ").append(String.format("%.2f", _source.getCostModifier()));
+        final StringBuilder lr4 = new StringBuilder("Distance modifier: ").append(String.format("%.2f", _source.getDistanceModifier()));
+        final StringBuilder lr5 = new StringBuilder("Maximal distance: ").append((int) Math.floor(_source.getDistanceModifier() * _plugin.getMainConfig().getBaseMaxDistance()));
+
+        meta.setLore(Arrays.asList(lr1.toString(), lr2.toString(), lr3.toString(), lr4.toString(), lr5.toString()));
         item.setItemMeta(meta);
 
         return item;
@@ -71,11 +75,8 @@ public class TeleporterMenu implements Listener {
         
         final StringBuilder lr2 = new StringBuilder();
         lr2.append("Fuel cost: ").append(_source.getFuelCost(t.getLocation()));
-        final StringBuilder lr3 = new StringBuilder("Cost modifier: ").append(_source.getCostModifier());
-        final StringBuilder lr4 = new StringBuilder("Distance modifier: ").append(_source.getDistanceModifier());
-        final StringBuilder lr5 = new StringBuilder("Maximal distance: ").append((int) Math.floor(_source.getDistanceModifier() * _plugin.getMainConfig().getBaseMaxDistance()));
         
-        meta.setLore(Arrays.asList(lr1.toString(), lr2.toString(), lr3.toString(), lr4.toString(), lr5.toString()));
+        meta.setLore(Arrays.asList(lr1.toString(), lr2.toString()));
         item.setItemMeta(meta);
         return item;
     }

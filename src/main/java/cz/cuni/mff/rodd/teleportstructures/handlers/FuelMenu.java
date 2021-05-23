@@ -3,9 +3,11 @@ package cz.cuni.mff.rodd.teleportstructures.handlers;
 import java.util.Arrays;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
@@ -45,6 +47,16 @@ public class FuelMenu implements Listener {
 
         ItemStack fuel = e.getNewItems().values().stream().findFirst().get();
         if(!_plugin.getMainConfig().isFuel(fuel.getType())) {e.setCancelled(true);}
+    }
+
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent e) {
+        if(e.getClickedInventory() != _inv) return;
+        if(e.getCursor() == null) return;
+        if(e.getCursor().getType() != Material.AIR && !_plugin.getMainConfig().isFuel(e.getCursor().getType())) {
+            e.setCancelled(true);
+            return;
+        }
     }
 
     @EventHandler
