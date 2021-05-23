@@ -1,5 +1,6 @@
 package cz.cuni.mff.rodd.teleportstructures.handlers;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -53,7 +54,13 @@ public class SignHandler implements Listener {
         || m == Material.JUNGLE_SIGN || m == Material.SPRUCE_SIGN || m == Material.DARK_OAK_SIGN ||
         m == Material.OAK_WALL_SIGN || m == Material.BIRCH_WALL_SIGN || m == Material.ACACIA_WALL_SIGN
         || m == Material.JUNGLE_WALL_SIGN || m == Material.SPRUCE_WALL_SIGN || m == Material.DARK_OAK_WALL_SIGN) {
-            
+            Teleport t = _plugin.getTeleporterData().getTeleportAtPosition(e.getBlock().getLocation());
+            if(t == null) return;
+            if(t.getTeleportGroup().getOwnerUUID() != e.getPlayer().getUniqueId() && !e.getPlayer().hasPermission("teleportstructures.breaksign")) {
+                e.setCancelled(true);
+                return;
+            }
+            _plugin.getTeleporterData().removeTeleport(t);
         }
     }
     

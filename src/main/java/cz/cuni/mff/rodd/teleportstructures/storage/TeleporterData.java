@@ -124,6 +124,12 @@ public class TeleporterData {
         return _teleports.containsKey(name);
     }
 
+    public Teleport getTeleportAtPosition(Location loc) {
+        return _teleports.values().stream().filter((el) -> {
+            return el.getLocation().equals(loc);
+        }).findAny().orElse(null);
+    }
+
     public TeleportGroup getOrCreateTeleportGroup(String name, UUID owner) {
         if(_teleportGroups.containsKey(name)) return _teleportGroups.get(name);
 
@@ -162,6 +168,8 @@ public class TeleporterData {
     
     public boolean removeTeleport(Teleport t) {
         _data.set("groups." + t.getTeleportGroup().getGroupName() + ".teleports." + t.getName(), null);
+        _plugin.underigsterEvents(t.getTeleporterMenu().getFuelMenu());
+        _plugin.underigsterEvents(t.getTeleporterMenu());
         if(t.getTeleportGroup().getTeleports().size() == 1) {
             //This is last remaining teleporter
             _data.set("groups." + t.getTeleportGroup().getGroupName(), null);
