@@ -1,6 +1,7 @@
 package cz.cuni.mff.rodd.teleportstructures.handlers;
 
-import org.bukkit.Location;
+import java.util.logging.Level;
+
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -20,7 +21,7 @@ public class SignHandler implements Listener {
 
     @EventHandler
     public void onSignChangeEvent(SignChangeEvent e) {
-        if(e.getLine(0) != "[TeleStruct]") return;
+        if(!e.getLine(0).equals("[TeleStruct]")) { return; }
         String name = e.getLine(1);
         if(name.length() == 0) {
             e.setLine(0, "WRONG NAME");
@@ -40,11 +41,13 @@ public class SignHandler implements Listener {
             e.setLine(0, "WRONG GROUP");
             return;
         }
+        _plugin.getLogger().log(Level.INFO, name);
         if(!_plugin.getTeleporterData().createTeleport(e.getBlock().getLocation(), name, group, e.getPlayer().getUniqueId())) {
             e.setLine(0, "COULD NOT");
             e.setLine(1, "CREATE");
             return;
         }
+        _plugin.getTeleporterData().saveTeleporterDataToFile();
     }
 
     @EventHandler
@@ -54,13 +57,14 @@ public class SignHandler implements Listener {
         || m == Material.JUNGLE_SIGN || m == Material.SPRUCE_SIGN || m == Material.DARK_OAK_SIGN ||
         m == Material.OAK_WALL_SIGN || m == Material.BIRCH_WALL_SIGN || m == Material.ACACIA_WALL_SIGN
         || m == Material.JUNGLE_WALL_SIGN || m == Material.SPRUCE_WALL_SIGN || m == Material.DARK_OAK_WALL_SIGN) {
-            Teleport t = _plugin.getTeleporterData().getTeleportAtPosition(e.getBlock().getLocation());
+            Teleport t = _plugin.getTeleporterData().getTeleportAtBlockPosition(e.getBlock().getLocation());
             if(t == null) return;
             if(t.getTeleportGroup().getOwnerUUID() != e.getPlayer().getUniqueId() && !e.getPlayer().hasPermission("teleportstructures.breaksign")) {
                 e.setCancelled(true);
                 return;
             }
             _plugin.getTeleporterData().removeTeleport(t);
+            _plugin.getTeleporterData().saveTeleporterDataToFile();
         }
     }
     

@@ -2,9 +2,6 @@ package cz.cuni.mff.rodd.teleportstructures.handlers;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
-
-import javax.swing.UIDefaults.ActiveValue;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -18,7 +15,7 @@ import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.util.Vector;
 
 import cz.cuni.mff.rodd.teleportstructures.TeleportStructures;
 import cz.cuni.mff.rodd.teleportstructures.teleports.Teleport;
@@ -55,7 +52,8 @@ public class TeleporterMenu implements Listener {
         final ItemMeta meta = item.getItemMeta();
         meta.setDisplayName("Fuel");
         final StringBuilder lr1 = new StringBuilder("Current fuel: ").append(_source.getFuel());
-        meta.setLore(Arrays.asList(lr1.toString()));
+        final StringBuilder lr2 = new StringBuilder("Max fuel: ").append(_plugin.getMainConfig().getBaseMaxFuel());
+        meta.setLore(Arrays.asList(lr1.toString(), lr2.toString()));
         item.setItemMeta(meta);
 
         return item;
@@ -66,15 +64,18 @@ public class TeleporterMenu implements Listener {
         final ItemMeta meta = item.getItemMeta();
         meta.setDisplayName(t.getName());
         final StringBuilder lr1 = new StringBuilder();
-        lr1.append(t.getLocation().getWorld())
+        lr1.append(t.getLocation().getWorld().getName())
             .append(", x:").append(t.getLocation().getBlockX())
             .append(", y:").append(t.getLocation().getBlockY())
             .append(", z:").append(t.getLocation().getBlockZ());
         
         final StringBuilder lr2 = new StringBuilder();
         lr2.append("Fuel cost: ").append(_source.getFuelCost(t.getLocation()));
-
-        meta.setLore(Arrays.asList(lr1.toString(), lr2.toString()));
+        final StringBuilder lr3 = new StringBuilder("Cost modifier: ").append(_source.getCostModifier());
+        final StringBuilder lr4 = new StringBuilder("Distance modifier: ").append(_source.getDistanceModifier());
+        final StringBuilder lr5 = new StringBuilder("Maximal distance: ").append((int) Math.floor(_source.getDistanceModifier() * _plugin.getMainConfig().getBaseMaxDistance()));
+        
+        meta.setLore(Arrays.asList(lr1.toString(), lr2.toString(), lr3.toString(), lr4.toString(), lr5.toString()));
         item.setItemMeta(meta);
         return item;
     }
@@ -83,8 +84,10 @@ public class TeleporterMenu implements Listener {
         _teleports.clear();
         _inv.clear();
         _source.getAvailibleTeleports().stream().forEach((el) -> {
-            final ItemStack tit = createTeleportItem(el);
-            _teleports.put(tit, el);
+            if(el.getAvailibleTeleports().contains(_source)) {
+                final ItemStack tit = createTeleportItem(el);
+                _teleports.put(tit, el);
+            }
         });
         initializeItems();
         ent.openInventory(_inv);
@@ -101,6 +104,7 @@ public class TeleporterMenu implements Listener {
         e.setCancelled(true);
 
         final ItemStack clickedItem = e.getCurrentItem();
+        if(clickedItem == null || clickedItem.getType() == Material.AIR) {return;}
         final Player p = (Player) e.getWhoClicked();
 
         if(clickedItem.getType() == Material.BLAZE_POWDER) {
@@ -140,10 +144,18 @@ public class TeleporterMenu implements Listener {
                 @Override
                 public void run() {
                     p.closeInventory();
-                    p.teleportAsync(dest.getLocation().clone().add(0,2,0), TeleportCause.PLUGIN); // TODO: effects?
+                    p.setVelocity(new Vector(0,2,0));
                 }
-            }, 2L);
+            }, 1L);
+            _plugin.getServer().getScheduler().scheduleSyncDelayedTask(_plugin, new Runnable() {
+                @Override
+                public void run() {
+                    p.setVelocity(new Vector(0,0,0));
+                    p.teleportAsync(dest.getLocation().clone().add(0,3,0), TeleportCause.PLUGIN); // TODO: effects?
+                }
+            }, 10L);
             _source.substractFuel(_source.getFuelCost(dest.getLocation()));
+            _plugin.getTeleporterData().saveFuel(_source);
             
         }
     }

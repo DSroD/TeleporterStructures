@@ -6,9 +6,9 @@ maxDistance: 2000
 
 #Cost per block traveled before applying modifiers
 #Cost is always rounded up to nearest larger integer
-costPerBlockTraveled: 1
+costPerBlockTraveled: 2
 
-baseMaxFuel: 15000
+baseMaxFuel: 22000
 
 constructionBlocks:
   - STONE_BRICKS
@@ -18,20 +18,21 @@ constructionBlocks:
 secondaryConstructionBlocks:
   - STONE_SLAB
   - STONE_BRICK_SLAB
+  - SMOOTH_STONE_SLAB
 
 blockModifiers:
   IRON_BLOCK:
-    cost: 1.2
-    distance: 1.4
+    cost: 0.82
+    distance: 0.85
   EMERALD_BLOCK:
-    cost: 1.1
-    distance: 4
-  GOLDEN_BLOCK:
-    cost: 1.2
-    distance: 6
+    cost: 0.8
+    distance: 0.9
+  GOLD_BLOCK:
+    cost: 1.12
+    distance: 1.25
   DIAMOND_BLOCK:
-    cost: 1.4
-    distance: 12
+    cost: 1.3
+    distance: 1.6
 
 fuel:
   IRON_INGOT:

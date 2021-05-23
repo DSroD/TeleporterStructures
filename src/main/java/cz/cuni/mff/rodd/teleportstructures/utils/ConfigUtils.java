@@ -3,7 +3,6 @@ package cz.cuni.mff.rodd.teleportstructures.utils;
 import cz.cuni.mff.rodd.teleportstructures.TeleportStructures;
 import cz.cuni.mff.rodd.teleportstructures.config.MainConfig;
 import org.bukkit.Material;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.logging.Level;
 
@@ -85,13 +84,6 @@ public class ConfigUtils {
                 config.addFuel(mat, plugin.getConfig().getInt("fuel." + strmat + ".fuelValue"));
         }
 
-    }
-
-    public static void saveConfiguration(MainConfig config, TeleportStructures plugin) {
-        //HAHA I should definetly call this ASAP!
-        //      Really this method is not needed yet as there is no means of changing config values programmatically,
-        //      I will keep this here just for the sake of completeness and add functionality when needed
-        throw new NotImplementedException();
     }
 
 }

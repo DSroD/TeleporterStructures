@@ -52,10 +52,12 @@ public class FuelMenu implements Listener {
         if(e.getInventory() != _inv) return;
 
         int nf = Arrays.asList(e.getInventory().getContents()).stream().mapToInt((el) -> {
+            if (el == null) {return 0;}
             return _plugin.getMainConfig().getFuelValue(el.getType()) * el.getAmount();
         }).sum();
-
-        _t.addFuel(nf);   
+        _inv.clear();
+        _t.addFuel(nf);
+        _plugin.getTeleporterData().saveFuel(_t);
     }
     
 }

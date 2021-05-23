@@ -3,7 +3,6 @@ package cz.cuni.mff.rodd.teleportstructures.handlers;
 import cz.cuni.mff.rodd.teleportstructures.TeleportStructures;
 import cz.cuni.mff.rodd.teleportstructures.teleports.Teleport;
 
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -24,7 +23,10 @@ public class PlayerSneakHandler implements Listener {
         Player player = event.getPlayer();
         Teleport t = _plugin.getTeleporterData().getTeleportOnLocation(player.getLocation());
         if(t == null) return;
-
+        if(!t.isValidStructure()) {
+            event.getPlayer().sendMessage("This teleport structure is broken!");
+            return;
+        }
         t.getTeleporterMenu().openInventory(player);
 
         //TODO: Open GUI with group-linked portals (link only two-way possible portals - if player teleports somewhere

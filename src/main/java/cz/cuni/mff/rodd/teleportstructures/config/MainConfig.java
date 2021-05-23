@@ -1,6 +1,5 @@
 package cz.cuni.mff.rodd.teleportstructures.config;
 
-import cz.cuni.mff.rodd.teleportstructures.TeleportStructures;
 import org.bukkit.Material;
 
 import java.util.HashMap;
@@ -12,8 +11,6 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class MainConfig {
-
-    private TeleportStructures plugin;
 
     public static final int configVersion = 1;
 
@@ -29,12 +26,12 @@ public class MainConfig {
     private List<Material> _structureBlocks;
     private List<Material> _secondaryStructureBlocks;
 
-    public MainConfig(TeleportStructures plugin) {
-        this.plugin = plugin;
+    public MainConfig() {
         _costModifiers = new HashMap<>();
         _distanceModifiers = new HashMap<>();
         _fuelValues = new HashMap<>();
         _structureBlocks = new ArrayList<>();
+        _secondaryStructureBlocks = new ArrayList<>();
     }
 
     public void setBaseMaxDistance(int maxDistance) {

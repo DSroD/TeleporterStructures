@@ -1,12 +1,9 @@
 package cz.cuni.mff.rodd.teleportstructures.teleports;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
@@ -42,8 +39,8 @@ public class Teleport {
 
         Arrays.asList(0,1,3),
         Arrays.asList(0,1,2),
-        Arrays.asList(0,1,3),
-        Arrays.asList(0,1,3),
+        Arrays.asList(0,1,-2),
+        Arrays.asList(0,1,-3),
 
         Arrays.asList(-1,1,3),
         Arrays.asList(-1,1,2),
@@ -58,9 +55,9 @@ public class Teleport {
         Arrays.asList(-2,1,-1),
         Arrays.asList(-2,1,-2),
 
-        Arrays.asList(3,1,1),
-        Arrays.asList(3,1,0),
-        Arrays.asList(3,1,-1),
+        Arrays.asList(-3,1,1),
+        Arrays.asList(-3,1,0),
+        Arrays.asList(-3,1,-1),
 
         Arrays.asList(2,2,2),
         Arrays.asList(2,2,-2),
@@ -165,7 +162,7 @@ public class Teleport {
     public static boolean isValidStructure(TeleportStructures plugin, Location location) {
         boolean check_mat = _relMaterialBlocks.stream().takeWhile(rel_pos -> {
             Location loc = location.clone();
-            loc.add(rel_pos.get(0), rel_pos.get(1), rel_pos.get(2));
+            loc = loc.add(rel_pos.get(0), rel_pos.get(1), rel_pos.get(2));
             if(!loc.getChunk().isLoaded()) {
                 loc.getChunk().load(true);
             }
@@ -178,7 +175,7 @@ public class Teleport {
         // Check structure blocks (secondary)
         check_mat = _relSSStructureBlocks.stream().takeWhile(rel_pos -> {
             Location loc = location.clone();
-            loc.add(rel_pos.get(0), rel_pos.get(1), rel_pos.get(2));
+            loc = loc.add(rel_pos.get(0), rel_pos.get(1), rel_pos.get(2));
             if(!loc.getChunk().isLoaded()) {
                 loc.getChunk().load(true);
             }
@@ -190,13 +187,28 @@ public class Teleport {
         // Check structure blocks (main) - StoneBricks
         check_mat = _relSBStructureBlocks.stream().takeWhile(rel_pos -> {
             Location loc = location.clone();
-            loc.add(rel_pos.get(0), rel_pos.get(1), rel_pos.get(2));
+            loc = loc.add(rel_pos.get(0), rel_pos.get(1), rel_pos.get(2));
             if(!loc.getChunk().isLoaded()) {
                 loc.getChunk().load(true);
             }
             return plugin.getMainConfig().isStructureBlock(loc.getBlock().getType());
         }).count() == _relSBStructureBlocks.size();
         return check_mat;
+    }
+
+    public static void buildStructure(Location loc) {
+        _relMaterialBlocks.stream().forEach((el) -> {
+            Location _loc = loc.clone().add(el.get(0), el.get(1)-1, el.get(2));
+            _loc.getBlock().setType(Material.STONE_BRICKS);
+        });
+        _relSSStructureBlocks.stream().forEach((el) -> {
+            Location _loc = loc.clone().add(el.get(0), el.get(1)-1, el.get(2));
+            _loc.getBlock().setType(Material.SMOOTH_STONE_SLAB);
+        });
+        _relSBStructureBlocks.stream().forEach((el) -> {
+            Location _loc = loc.clone().add(el.get(0), el.get(1)-1, el.get(2));
+            _loc.getBlock().setType(Material.STONE_BRICKS);
+        });
     }
 
     public boolean isValidStructure() {

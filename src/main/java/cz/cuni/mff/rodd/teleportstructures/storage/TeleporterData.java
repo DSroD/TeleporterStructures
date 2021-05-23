@@ -7,7 +7,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,7 +18,6 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 
 public class TeleporterData {
-    //TODO: This class will be used to save and load teleporter groups.
     //TODO: Should datafile contain version check for deprecated formats?
 
     TeleportStructures _plugin;
@@ -53,8 +51,9 @@ public class TeleporterData {
 
     public void loadTeleporterDataFromFile() {
         _data = YamlConfiguration.loadConfiguration(_dataFile);
+        if(_data.getConfigurationSection("groups") == null) return;
         for(String groupSection : _data.getConfigurationSection("groups").getKeys(false)) { //Loop through groups
-            TeleportGroup g = new TeleportGroup(groupSection, UUID.fromString(_data.getString("group."+groupSection+".owner")));
+            TeleportGroup g = new TeleportGroup(groupSection, UUID.fromString(_data.getString("groups."+groupSection+".owner")));
             _teleportGroups.put(groupSection, g);
             for(String teleport : _data.getConfigurationSection("groups."+groupSection+".teleports").getKeys(false)) { //Loop through teleports in group
                 Teleport t = new Teleport(_plugin,
@@ -63,9 +62,11 @@ public class TeleporterData {
                             _data.getInt("groups."+groupSection+".teleports." + teleport + ".x"),
                             _data.getInt("groups."+groupSection+".teleports." + teleport + ".y"),
                             _data.getInt("groups."+groupSection+".teleports." + teleport + ".z")),
-                        _data.getString("groups."+groupSection+".teleports." + teleport),
+                        teleport,
                         g);
                 g.addTeleport(t);
+                _teleports.put(t.getName(), t);
+                t.setFuel(_data.getInt("groups."+groupSection+".teleports."+teleport+".fuel"));
             }
         }
     }
@@ -79,12 +80,8 @@ public class TeleporterData {
 
     }
 
-    public void setFuel(String groupName, String teleportName, int newFuel) //Call this on any fuel change event
-    {
-        Teleport t = _teleportGroups.get(groupName).getTeleport(teleportName);
-        if(t == null) return;
-        t.setFuel(newFuel);
-        _data.set("groups." + t.getTeleportGroup().getGroupName() + ".teleports." + t.getName() + ".fuel", newFuel);
+    public void saveFuel(Teleport t) {
+        _data.set("groups." + t.getTeleportGroup().getGroupName() + ".teleports." + t.getName() + ".fuel", t.getFuel());
     }
 
     public boolean createTeleport(Location l, String name, String groupName, UUID owner) {
@@ -96,10 +93,11 @@ public class TeleporterData {
         createGroup(groupName, owner);
         
         TeleportGroup g = _teleportGroups.get(groupName);
-        Teleport t = new Teleport(_plugin, l, name, g);
         
-        if(g.getOwnerUUID() == owner) {
+        if(g.getOwnerUUID().equals(owner)) {
+            Teleport t = new Teleport(_plugin, l, name, g);
             g.addTeleport(t);
+            _teleports.put(t.getName(), t);
             _data.createSection("groups." + g.getGroupName() + ".teleports." + t.getName());
             _data.set("groups." + g.getGroupName() + ".teleports." + t.getName() + ".x", t.getLocation().getBlockX());
             _data.set("groups." + g.getGroupName() + ".teleports." + t.getName() + ".y", t.getLocation().getBlockY());
@@ -124,9 +122,9 @@ public class TeleporterData {
         return _teleports.containsKey(name);
     }
 
-    public Teleport getTeleportAtPosition(Location loc) {
+    public Teleport getTeleportAtBlockPosition(Location loc) {
         return _teleports.values().stream().filter((el) -> {
-            return el.getLocation().equals(loc);
+            return el.getLocation().getBlock().getLocation().equals(loc);
         }).findAny().orElse(null);
     }
 
@@ -145,8 +143,8 @@ public class TeleporterData {
         if(!_teleportGroups.containsKey(groupName)) {return false;}
         Teleport t = _teleportGroups.get(groupName).getTeleport(teleportName);
         if(t == null) {return false;}
-        _plugin.underigsterEvents(t.getTeleporterMenu().getFuelMenu());
-        _plugin.underigsterEvents(t.getTeleporterMenu());
+        _plugin.unregisterEvents(t.getTeleporterMenu().getFuelMenu());
+        _plugin.unregisterEvents(t.getTeleporterMenu());
         if(_teleportGroups.get(groupName).getTeleports().size() <= 1) {
             _data.set("groups." + groupName, null);
             return _teleportGroups.remove(groupName) != null;
@@ -168,8 +166,9 @@ public class TeleporterData {
     
     public boolean removeTeleport(Teleport t) {
         _data.set("groups." + t.getTeleportGroup().getGroupName() + ".teleports." + t.getName(), null);
-        _plugin.underigsterEvents(t.getTeleporterMenu().getFuelMenu());
-        _plugin.underigsterEvents(t.getTeleporterMenu());
+        _plugin.unregisterEvents(t.getTeleporterMenu().getFuelMenu());
+        _plugin.unregisterEvents(t.getTeleporterMenu());
+        _teleports.remove(t.getName());
         if(t.getTeleportGroup().getTeleports().size() == 1) {
             //This is last remaining teleporter
             _data.set("groups." + t.getTeleportGroup().getGroupName(), null);
