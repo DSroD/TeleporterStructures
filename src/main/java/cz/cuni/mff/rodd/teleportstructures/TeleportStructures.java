@@ -43,7 +43,6 @@ public final class TeleportStructures extends JavaPlugin {
             @Override
             public void run() {
                 _teleportData.saveTeleporterDataToFile();
-                Bukkit.getLogger().log(Level.INFO, "TeleportData autosave!");
             }
         }, 1000L, 2000L);
 
