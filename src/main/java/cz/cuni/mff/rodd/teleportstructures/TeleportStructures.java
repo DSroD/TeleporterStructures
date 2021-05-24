@@ -1,9 +1,10 @@
 package cz.cuni.mff.rodd.teleportstructures;
 
-import cz.cuni.mff.rodd.teleportstructures.commands.GenerateCommand;
+import cz.cuni.mff.rodd.teleportstructures.commands.CommandHandler;
 import cz.cuni.mff.rodd.teleportstructures.config.MainConfig;
 import cz.cuni.mff.rodd.teleportstructures.handlers.PlayerSneakHandler;
 import cz.cuni.mff.rodd.teleportstructures.handlers.SignHandler;
+import cz.cuni.mff.rodd.teleportstructures.storage.StringData;
 import cz.cuni.mff.rodd.teleportstructures.storage.TeleporterData;
 import cz.cuni.mff.rodd.teleportstructures.utils.ConfigUtils;
 
@@ -17,6 +18,7 @@ public final class TeleportStructures extends JavaPlugin {
 
     private MainConfig _pluginConfig;
 
+    private StringData _strings;
     private TeleporterData _teleportData;
 
     private BukkitTask _autosaveTask;
@@ -29,9 +31,15 @@ public final class TeleportStructures extends JavaPlugin {
         _pluginConfig = new MainConfig();
         ConfigUtils.loadMainConfig(this);
 
+        //Initialize strings
+        _strings = new StringData(this);
+        _strings.loadStrings();
+
         //Initialize teleporter data
         _teleportData = new TeleporterData(this);
         _teleportData.loadTeleporterDataFromFile();
+
+        
 
         //Register events
         Bukkit.getPluginManager().registerEvents(new PlayerSneakHandler(this), this);
@@ -44,8 +52,7 @@ public final class TeleportStructures extends JavaPlugin {
             }
         }, 1000L, 2000L);
 
-        this.getCommand("telestruct").setExecutor(new GenerateCommand());
-        
+        this.getCommand("telestruct").setExecutor(new CommandHandler(this));
     }
 
     
@@ -70,5 +77,9 @@ public final class TeleportStructures extends JavaPlugin {
 
     public void unregisterEvents(Listener listener) {
          HandlerList.unregisterAll(listener);
+    }
+
+    public StringData getStrings() {
+        return _strings;
     }
 }

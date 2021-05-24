@@ -87,6 +87,7 @@ public class Teleport {
     private final TeleportGroup _teleportGroup;
     private int _fuel;
     private final TeleporterMenu _menu;
+    private boolean _requiresFuel;
 
     public Teleport(TeleportStructures plugin, Location loc, String name, TeleportGroup teleportGroup) {
         _plugin = plugin;
@@ -94,6 +95,8 @@ public class Teleport {
         _teleportName = name;
         _teleportGroup = teleportGroup;
         _menu = new TeleporterMenu(_plugin, this);
+        _fuel = 0;
+        _requiresFuel = true;
     }
 
     public Location getLocation() {
@@ -131,6 +134,7 @@ public class Teleport {
     }
 
     public int getFuelCost(Location loc) {
+        if(!_requiresFuel) {return 0;}
         int cpb = _plugin.getMainConfig().getCostPerBlockTraveled();
         return (int) Math.ceil(cpb * _location.distance(loc) * getCostModifier());
     }
@@ -251,6 +255,14 @@ public class Teleport {
 
     public TeleporterMenu getTeleporterMenu() {
         return _menu;
+    }
+
+    public void setRequiresFuel(boolean rf) {
+        _requiresFuel = rf;
+    }
+
+    public boolean requiresFuel() {
+        return _requiresFuel;
     }
 
 }

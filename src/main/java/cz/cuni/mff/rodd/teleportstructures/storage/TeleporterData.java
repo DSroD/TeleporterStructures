@@ -11,9 +11,11 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -67,7 +69,9 @@ public class TeleporterData {
                 g.addTeleport(t);
                 _teleports.put(t.getName(), t);
                 t.setFuel(_data.getInt("groups."+groupSection+".teleports."+teleport+".fuel"));
+                t.setRequiresFuel(_data.getBoolean("groups."+groupSection+".teleports."+teleport+".requiresFuel", true));
             }
+            _data.getStringList("groups."+groupSection+".editors").stream().forEach(uid -> g.addEditor(UUID.fromString(uid)));
         }
     }
 
@@ -84,6 +88,15 @@ public class TeleporterData {
         _data.set("groups." + t.getTeleportGroup().getGroupName() + ".teleports." + t.getName() + ".fuel", t.getFuel());
     }
 
+    public void saveEditors(TeleportGroup g) {
+        List<String> editors = g.getEditors().stream().map(UUID::toString).collect(Collectors.toList());
+        _data.set("groups."+g.getGroupName()+".editors", editors);
+    }
+
+    public void saveFuelRequired(Teleport t) {
+        _data.set("groups."+t.getTeleportGroup().getGroupName()+".teleports."+t.getName()+".requiresFuel", t.requiresFuel());
+    }
+
     public boolean createTeleport(Location l, String name, String groupName, UUID owner) {
         /**
          * This is called when player creates teleport ingame, structure passes all checks and newly created Teleport object
@@ -94,7 +107,7 @@ public class TeleporterData {
         
         TeleportGroup g = _teleportGroups.get(groupName);
         
-        if(g.getOwnerUUID().equals(owner)) {
+        if(g.getOwnerUUID().equals(owner) || g.isEditor(owner)) {
             Teleport t = new Teleport(_plugin, l, name, g);
             g.addTeleport(t);
             _teleports.put(t.getName(), t);
@@ -104,6 +117,7 @@ public class TeleporterData {
             _data.set("groups." + g.getGroupName() + ".teleports." + t.getName() + ".z", t.getLocation().getBlockZ());
             _data.set("groups." + g.getGroupName() + ".teleports." + t.getName() + ".world", t.getLocation().getWorld().getUID().toString());
             _data.set("groups." + g.getGroupName() + ".teleports." + t.getName() + ".fuel", 0);
+            _data.set("groups." + g.getGroupName() + ".teleports." + t.getName() + ".requiresFuel", true);
             return true;
         }
         return false;
@@ -153,17 +167,23 @@ public class TeleporterData {
         return _teleportGroups.get(groupName).removeTeleport(teleportName);
     }
 
+    /**
+     * Returns teleport that is NEAR (up to 4 blocks)
+     * @param loc Location of search
+     * @return Location or null, if nothing found
+     */
     @Nullable
     public Teleport getTeleportOnLocation(Location loc) {
+        
         final Optional<Teleport> n = _teleports.values().stream().filter((el) -> {
             return  (Math.abs(loc.getBlockX() - el.getLocation().getBlockX()) < 4) &&
                     ((loc.getBlockY() - el.getLocation().getBlockY()) < 4) &&
+                    ((loc.getBlockY() - el.getLocation().getBlockY()) > -1) &&
                     (Math.abs(loc.getBlockZ() - el.getLocation().getBlockZ()) < 4);
         }).findFirst();
         return (n.isPresent()) ? n.get() : null;
     }
 
-    
     public boolean removeTeleport(Teleport t) {
         _data.set("groups." + t.getTeleportGroup().getGroupName() + ".teleports." + t.getName(), null);
         _plugin.unregisterEvents(t.getTeleporterMenu().getFuelMenu());

@@ -23,28 +23,35 @@ public class SignHandler implements Listener {
     public void onSignChangeEvent(SignChangeEvent e) {
         if(!e.getLine(0).equals("[TeleStruct]")) { return; }
         String name = e.getLine(1);
-        if(name.length() == 0) {
-            e.setLine(0, "WRONG NAME");
+        String group = e.getLine(2);
+        if(name.length() == 0 || group.length() == 0) {
+            e.setLine(0, _plugin.getStrings().signWrongName.get(0));
+            e.setLine(1, _plugin.getStrings().signWrongName.get(1));
+            e.setLine(2, _plugin.getStrings().signWrongName.get(2));
+            e.setLine(3, _plugin.getStrings().signWrongName.get(3));
+            return;
         }
         if(_plugin.getTeleporterData().isTeleport(name)) {
-            e.setLine(0, "NAME ALREADY");
-            e.setLine(1, "IN USE");
+            e.setLine(0, _plugin.getStrings().signNameInUse.get(0));
+            e.setLine(1, _plugin.getStrings().signNameInUse.get(1));
+            e.setLine(2, _plugin.getStrings().signNameInUse.get(2));
+            e.setLine(3, _plugin.getStrings().signNameInUse.get(3));
             return;
         }
         if (!Teleport.isValidStructure(_plugin, e.getBlock().getLocation())) {
-            e.setLine(0, "INVALID");
-            e.setLine(1, "STRUCTURE");
+            e.setLine(0, _plugin.getStrings().signInvalidStructure.get(0));
+            e.setLine(1, _plugin.getStrings().signInvalidStructure.get(1));
+            e.setLine(2, _plugin.getStrings().signInvalidStructure.get(2));
+            e.setLine(3, _plugin.getStrings().signInvalidStructure.get(3));
             return;
         }
-        String group = e.getLine(2);
-        if(group.length() == 0) {
-            e.setLine(0, "WRONG GROUP");
-            return;
-        }
+
         _plugin.getLogger().log(Level.INFO, name);
         if(!_plugin.getTeleporterData().createTeleport(e.getBlock().getLocation(), name, group, e.getPlayer().getUniqueId())) {
-            e.setLine(0, "COULD NOT");
-            e.setLine(1, "CREATE");
+            e.setLine(0, _plugin.getStrings().signGroupOwnerMismatch.get(0));
+            e.setLine(1, _plugin.getStrings().signGroupOwnerMismatch.get(1));
+            e.setLine(2, _plugin.getStrings().signGroupOwnerMismatch.get(2));
+            e.setLine(3, _plugin.getStrings().signGroupOwnerMismatch.get(3));
             return;
         }
         _plugin.getTeleporterData().saveTeleporterDataToFile();
@@ -59,7 +66,7 @@ public class SignHandler implements Listener {
         || m == Material.JUNGLE_WALL_SIGN || m == Material.SPRUCE_WALL_SIGN || m == Material.DARK_OAK_WALL_SIGN) {
             Teleport t = _plugin.getTeleporterData().getTeleportAtBlockPosition(e.getBlock().getLocation());
             if(t == null) return;
-            if(t.getTeleportGroup().getOwnerUUID() != e.getPlayer().getUniqueId() && !e.getPlayer().hasPermission("teleportstructures.breaksign")) {
+            if(t.getTeleportGroup().getOwnerUUID() != e.getPlayer().getUniqueId() && !e.getPlayer().hasPermission("teleportstructures.breaksign") && !t.getTeleportGroup().isEditor(e.getPlayer().getUniqueId())) {
                 e.setCancelled(true);
                 return;
             }

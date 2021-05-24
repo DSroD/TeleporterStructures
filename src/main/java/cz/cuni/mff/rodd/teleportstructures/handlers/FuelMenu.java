@@ -25,7 +25,7 @@ public class FuelMenu implements Listener {
     public FuelMenu(TeleportStructures plugin, Teleport t) {
         _plugin = plugin;
         _t = t;
-        _inv = Bukkit.createInventory(null, 9, "Add Fuel");
+        _inv = Bukkit.createInventory(null, 9, _plugin.getStrings().fuelInvName);
         Bukkit.getPluginManager().registerEvents(this, _plugin);
     }
 

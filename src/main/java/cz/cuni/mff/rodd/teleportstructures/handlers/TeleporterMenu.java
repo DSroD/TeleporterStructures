@@ -52,12 +52,12 @@ public class TeleporterMenu implements Listener {
     private ItemStack createFuelItem() {
         final ItemStack item = new ItemStack(Material.BLAZE_POWDER, 1);
         final ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName("Fuel");
-        final StringBuilder lr1 = new StringBuilder("Current fuel: ").append(_source.getFuel());
-        final StringBuilder lr2 = new StringBuilder("Max fuel: ").append(_plugin.getMainConfig().getBaseMaxFuel());
-        final StringBuilder lr3 = new StringBuilder("Cost modifier: ").append(String.format("%.2f", _source.getCostModifier()));
-        final StringBuilder lr4 = new StringBuilder("Distance modifier: ").append(String.format("%.2f", _source.getDistanceModifier()));
-        final StringBuilder lr5 = new StringBuilder("Maximal distance: ").append((int) Math.floor(_source.getDistanceModifier() * _plugin.getMainConfig().getBaseMaxDistance()));
+        meta.setDisplayName(_plugin.getStrings().fuel);
+        final StringBuilder lr1 = new StringBuilder(_plugin.getStrings().currentFuel).append(": ").append(_source.getFuel());
+        final StringBuilder lr2 = new StringBuilder(_plugin.getStrings().maxFuel).append(": ").append(_plugin.getMainConfig().getBaseMaxFuel());
+        final StringBuilder lr3 = new StringBuilder(_plugin.getStrings().costModifier).append(": ").append(String.format("%.2f", _source.getCostModifier()));
+        final StringBuilder lr4 = new StringBuilder(_plugin.getStrings().distanceModifier).append(": ").append(String.format("%.2f", _source.getDistanceModifier()));
+        final StringBuilder lr5 = new StringBuilder(_plugin.getStrings().maxDistance).append(": ").append((int) Math.floor(_source.getDistanceModifier() * _plugin.getMainConfig().getBaseMaxDistance()));
 
         meta.setLore(Arrays.asList(lr1.toString(), lr2.toString(), lr3.toString(), lr4.toString(), lr5.toString()));
         item.setItemMeta(meta);
@@ -76,7 +76,7 @@ public class TeleporterMenu implements Listener {
             .append(", z:").append(t.getLocation().getBlockZ());
         
         final StringBuilder lr2 = new StringBuilder();
-        lr2.append("Fuel cost: ").append(_source.getFuelCost(t.getLocation()));
+        lr2.append(_plugin.getStrings().fuelCost).append(": ").append(_source.getFuelCost(t.getLocation()));
         
         meta.setLore(Arrays.asList(lr1.toString(), lr2.toString()));
         item.setItemMeta(meta);
@@ -110,7 +110,7 @@ public class TeleporterMenu implements Listener {
         if(clickedItem == null || clickedItem.getType() == Material.AIR) {return;}
         final Player p = (Player) e.getWhoClicked();
 
-        if(clickedItem.getType() == Material.BLAZE_POWDER) {
+        if(clickedItem.getType() == Material.BLAZE_POWDER && _source.requiresFuel()) {
             _plugin.getServer().getScheduler().scheduleSyncDelayedTask(_plugin, new Runnable() {
                 @Override
                 public void run() {
@@ -130,7 +130,7 @@ public class TeleporterMenu implements Listener {
         if(clickedItem.getType() == Material.ENDER_PEARL) { // Perform teleport
             Teleport dest = _teleports.get(clickedItem);
             
-            if(_source.getFuelCost(dest.getLocation()) > _source.getFuel()) { // Check fuel
+            if(_source.getFuelCost(dest.getLocation()) > _source.getFuel() && _source.requiresFuel()) { // Check fuel
                 p.sendMessage("There is not enough fuel!");
                 return;
             }
@@ -146,16 +146,16 @@ public class TeleporterMenu implements Listener {
             _plugin.getServer().getScheduler().scheduleSyncDelayedTask(_plugin, new Runnable() {
                 @Override
                 public void run() {
-                    p.getLocation().getWorld().playEffect(p.getLocation(), Effect.DRAGON_BREATH, 0, 25);
+                    p.getLocation().getWorld().playEffect(p.getLocation(), Effect.BLAZE_SHOOT, 0, 25);
                     p.closeInventory();
                     p.setVelocity(new Vector(0,2,0));
                 }
             }, 1L);
 
-            _plugin.getServer().getScheduler().scheduleAsyncRepeatingTask(_plugin, new Runnable() {
+            int task = _plugin.getServer().getScheduler().scheduleAsyncRepeatingTask(_plugin, new Runnable() {
                 @Override
                 public void run() {
-                    p.getLocation().getWorld().spawnParticle(Particle.DRAGON_BREATH, p.getLocation(), 10);
+                    p.getLocation().getWorld().spawnParticle(Particle.SMOKE_LARGE, p.getLocation(), 20);
                     
                 }
             }, 1L, 2L);
@@ -164,6 +164,7 @@ public class TeleporterMenu implements Listener {
                 public void run() {
                     p.setVelocity(new Vector(0,0,0));
                     p.teleportAsync(dest.getLocation().clone().add(0,3,0), TeleportCause.PLUGIN);
+                    _plugin.getServer().getScheduler().cancelTask(task);
                 }
             }, 10L);
             _source.substractFuel(_source.getFuelCost(dest.getLocation()));

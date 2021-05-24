@@ -13,3 +13,5 @@ permissions:
     default: op
   teleportstructures.genstruct:
     default: op
+  teleportstructures.changereqfuel:
+    default: op

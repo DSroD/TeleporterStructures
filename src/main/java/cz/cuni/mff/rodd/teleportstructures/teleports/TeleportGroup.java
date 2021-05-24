@@ -14,11 +14,13 @@ public class TeleportGroup {
     private String _groupName;
     private Set<Teleport> _teleports;
     private UUID _ownerUUID;
+    private Set<UUID> _editorUUIDS;
 
     public TeleportGroup(String name, UUID owner) {
         _groupName = name;
         _ownerUUID = owner;
         _teleports = new HashSet<>();
+        _editorUUIDS = new HashSet<>();
     }
 
     public void addTeleport(Teleport teleport) {
@@ -62,6 +64,22 @@ public class TeleportGroup {
             }
         }
         return false;
+    }
+
+    public boolean isEditor(UUID uuid) {
+        return _editorUUIDS.contains(uuid);
+    }
+
+    public boolean addEditor(UUID uuid) {
+        return _editorUUIDS.add(uuid);
+    }
+
+    public boolean removeEditor(UUID uuid) {
+        return _editorUUIDS.remove(uuid);
+    }
+
+    public Set<UUID> getEditors() {
+        return _editorUUIDS;
     }
 
     @Nullable

@@ -1,0 +1,35 @@
+notEnoughFuel: Not enough fuel!
+teleporterAtDestinationBroken: Teleport at chosen destination is broken!
+fuel: Fuel
+fuelCost: Fuel cost
+currentFuel: Current fuel
+maxFuel: Maximum fuel
+costModifier: Cost modifier
+distanceModifier: Distance modifier
+maxDistance: Maximal distance
+
+fuelInvName: Add Fuel
+
+signWrongName:
+  - WRONG NAME
+  - OR WRONG
+  - GROUP NAME
+  - ""
+
+signNameInUse:
+  - NAME ALREADY
+  - IN USE
+  - ""
+  - ""
+
+signInvalidStructure:
+  - INVALID
+  - STRUCTURE
+  - ""
+  - ""
+
+signGroupOwnerMismatch:
+  - YOU CAN NOT
+  - ADD TELEPORTER
+  - TO THIS GROUP
+  - ""
