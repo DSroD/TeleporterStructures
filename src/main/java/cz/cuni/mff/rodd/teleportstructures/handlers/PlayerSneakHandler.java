@@ -11,10 +11,10 @@ import org.bukkit.event.player.PlayerToggleSneakEvent;
 
 public class PlayerSneakHandler implements Listener {
 
-    private TeleportStructures _plugin;
+    private final TeleportStructures _plugin;
 
     public PlayerSneakHandler(TeleportStructures plugin) {
-        this._plugin = plugin;
+        _plugin = plugin;
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled=true)
@@ -28,10 +28,6 @@ public class PlayerSneakHandler implements Listener {
             return;
         }
         t.getTeleporterMenu().openInventory(player);
-
-        //TODO: Open GUI with group-linked portals (link only two-way possible portals - if player teleports somewhere
-        //      portal there HAS to be able to teleport him back, this makes system more interesting and encourages
-        //      usage of short-distance teleporters near hubs
     }
 
 }

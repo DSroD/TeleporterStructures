@@ -20,11 +20,11 @@ public class MainConfig {
 
     private int _baseMaxFuel = 14000;
 
-    private Map<Material, Double> _costModifiers;
-    private Map<Material, Double> _distanceModifiers;
-    private Map<Material, Integer> _fuelValues;
-    private List<Material> _structureBlocks;
-    private List<Material> _secondaryStructureBlocks;
+    private final Map<Material, Double> _costModifiers;
+    private final Map<Material, Double> _distanceModifiers;
+    private final Map<Material, Integer> _fuelValues;
+    private final List<Material> _structureBlocks;
+    private final List<Material> _secondaryStructureBlocks;
 
     public MainConfig() {
         _costModifiers = new HashMap<>();

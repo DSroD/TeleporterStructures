@@ -81,12 +81,12 @@ public class Teleport {
         Arrays.asList(-3,2,-1)
     );
 
-    private TeleportStructures _plugin;
-    private Location _location;
-    private String _teleportName;
-    private TeleportGroup _teleportGroup;
+    private final TeleportStructures _plugin;
+    private final Location _location;
+    private final String _teleportName;
+    private final TeleportGroup _teleportGroup;
     private int _fuel;
-    private TeleporterMenu _menu;
+    private final TeleporterMenu _menu;
 
     public Teleport(TeleportStructures plugin, Location loc, String name, TeleportGroup teleportGroup) {
         _plugin = plugin;

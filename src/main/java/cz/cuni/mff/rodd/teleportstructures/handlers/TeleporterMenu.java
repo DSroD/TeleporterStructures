@@ -4,7 +4,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Effect;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -144,15 +146,24 @@ public class TeleporterMenu implements Listener {
             _plugin.getServer().getScheduler().scheduleSyncDelayedTask(_plugin, new Runnable() {
                 @Override
                 public void run() {
+                    p.getLocation().getWorld().playEffect(p.getLocation(), Effect.DRAGON_BREATH, 0, 25);
                     p.closeInventory();
                     p.setVelocity(new Vector(0,2,0));
                 }
             }, 1L);
+
+            _plugin.getServer().getScheduler().scheduleAsyncRepeatingTask(_plugin, new Runnable() {
+                @Override
+                public void run() {
+                    p.getLocation().getWorld().spawnParticle(Particle.DRAGON_BREATH, p.getLocation(), 10);
+                    
+                }
+            }, 1L, 2L);
             _plugin.getServer().getScheduler().scheduleSyncDelayedTask(_plugin, new Runnable() {
                 @Override
                 public void run() {
                     p.setVelocity(new Vector(0,0,0));
-                    p.teleportAsync(dest.getLocation().clone().add(0,3,0), TeleportCause.PLUGIN); // TODO: effects?
+                    p.teleportAsync(dest.getLocation().clone().add(0,3,0), TeleportCause.PLUGIN);
                 }
             }, 10L);
             _source.substractFuel(_source.getFuelCost(dest.getLocation()));

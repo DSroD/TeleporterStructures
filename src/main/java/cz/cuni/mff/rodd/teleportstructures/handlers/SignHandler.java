@@ -13,7 +13,7 @@ import cz.cuni.mff.rodd.teleportstructures.teleports.Teleport;
 
 public class SignHandler implements Listener {
 
-    TeleportStructures _plugin;
+    private final TeleportStructures _plugin;
 
     public SignHandler(TeleportStructures plugin) {
         _plugin = plugin;

@@ -20,10 +20,10 @@ import javax.annotation.Nullable;
 public class TeleporterData {
     //TODO: Should datafile contain version check for deprecated formats?
 
-    TeleportStructures _plugin;
+    private final TeleportStructures _plugin;
 
-    private Map<String, TeleportGroup> _teleportGroups;
-    private Map<String, Teleport> _teleports;
+    private final Map<String, TeleportGroup> _teleportGroups;
+    private final Map<String, Teleport> _teleports;
 
     private FileConfiguration _data = null;
     private File _dataFile = null;
