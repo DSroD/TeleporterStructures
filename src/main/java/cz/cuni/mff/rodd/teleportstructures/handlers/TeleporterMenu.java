@@ -22,6 +22,7 @@ import org.bukkit.util.Vector;
 import cz.cuni.mff.rodd.teleportstructures.TeleportStructures;
 import cz.cuni.mff.rodd.teleportstructures.teleports.Teleport;
 
+@SuppressWarnings("deprecation")
 public class TeleporterMenu implements Listener {
 
 
@@ -52,12 +53,12 @@ public class TeleporterMenu implements Listener {
     private ItemStack createFuelItem() {
         final ItemStack item = new ItemStack(Material.BLAZE_POWDER, 1);
         final ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(_plugin.getStrings().fuel);
-        final StringBuilder lr1 = new StringBuilder(_plugin.getStrings().currentFuel).append(": ").append(_source.getFuel());
-        final StringBuilder lr2 = new StringBuilder(_plugin.getStrings().maxFuel).append(": ").append(_plugin.getMainConfig().getBaseMaxFuel());
-        final StringBuilder lr3 = new StringBuilder(_plugin.getStrings().costModifier).append(": ").append(String.format("%.2f", _source.getCostModifier()));
-        final StringBuilder lr4 = new StringBuilder(_plugin.getStrings().distanceModifier).append(": ").append(String.format("%.2f", _source.getDistanceModifier()));
-        final StringBuilder lr5 = new StringBuilder(_plugin.getStrings().maxDistance).append(": ").append((int) Math.floor(_source.getDistanceModifier() * _plugin.getMainConfig().getBaseMaxDistance()));
+        meta.setDisplayName((_source.requiresFuel() ? _plugin.getStrings().getFuel() : "Teleporter"));
+        final StringBuilder lr1 = new StringBuilder(_plugin.getStrings().getCurrentFuel()).append(": ").append((_source.requiresFuel() ? _source.getFuel() : 0));
+        final StringBuilder lr2 = new StringBuilder(_plugin.getStrings().getMaxFuel()).append(": ").append(_plugin.getMainConfig().getBaseMaxFuel());
+        final StringBuilder lr3 = new StringBuilder(_plugin.getStrings().getCostModifier()).append(": ").append(String.format("%.2f", _source.getCostModifier()));
+        final StringBuilder lr4 = new StringBuilder(_plugin.getStrings().getDistanceModifier()).append(": ").append(String.format("%.2f", _source.getDistanceModifier()));
+        final StringBuilder lr5 = new StringBuilder(_plugin.getStrings().getMaxDistance()).append(": ").append((int) Math.floor(_source.getDistanceModifier() * _plugin.getMainConfig().getBaseMaxDistance()));
 
         meta.setLore(Arrays.asList(lr1.toString(), lr2.toString(), lr3.toString(), lr4.toString(), lr5.toString()));
         item.setItemMeta(meta);
@@ -76,7 +77,7 @@ public class TeleporterMenu implements Listener {
             .append(", z:").append(t.getLocation().getBlockZ());
         
         final StringBuilder lr2 = new StringBuilder();
-        lr2.append(_plugin.getStrings().fuelCost).append(": ").append(_source.getFuelCost(t.getLocation()));
+        lr2.append(_plugin.getStrings().getFuelCost()).append(": ").append(_source.getFuelCost(t.getLocation()));
         
         meta.setLore(Arrays.asList(lr1.toString(), lr2.toString()));
         item.setItemMeta(meta);

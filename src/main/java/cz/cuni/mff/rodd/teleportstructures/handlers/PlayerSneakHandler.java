@@ -24,7 +24,7 @@ public class PlayerSneakHandler implements Listener {
         Teleport t = _plugin.getTeleporterData().getTeleportOnLocation(player.getLocation());
         if(t == null) return;
         if(!t.isValidStructure()) {
-            event.getPlayer().sendMessage(_plugin.getStrings().teleporterAtDestinationBroken);
+            event.getPlayer().sendMessage(_plugin.getStrings().getTeleporterHereBroken());
             return;
         }
         t.getTeleporterMenu().openInventory(player);

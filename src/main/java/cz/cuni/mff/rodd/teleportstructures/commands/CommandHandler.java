@@ -4,7 +4,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -32,7 +31,7 @@ public class CommandHandler implements CommandExecutor {
                     
 
                     if(!player.hasPermission("teleportstructures.genstruct")) {
-                        player.sendMessage("You are not allowed to do this.");
+                        player.sendMessage(_plugin.getStrings().getNotAllowed());
                         return false;
                     }
             
@@ -41,12 +40,12 @@ public class CommandHandler implements CommandExecutor {
 
                 if(args[0].equals("requirefuel")) {
                     if(!player.hasPermission("teleportstructures.changereqfuel")) {
-                        player.sendMessage("You are not allowed to do this.");
+                        player.sendMessage(_plugin.getStrings().getNotAllowed());
                         return false;
                     }
                     Teleport t = _plugin.getTeleporterData().getTeleportOnLocation(player.getLocation());
                     if(t == null) {
-                        player.sendMessage("You are not standing on any teleport.");
+                        player.sendMessage(_plugin.getStrings().getNotOnTeleporter());
                         return false;
                     }
                     boolean pervstate = t.requiresFuel();
@@ -95,7 +94,7 @@ public class CommandHandler implements CommandExecutor {
                     }
                     Teleport t = _plugin.getTeleporterData().getTeleportOnLocation(player.getLocation());
                     if(t == null) {
-                        player.sendMessage("You are not standing on any teleport!");
+                        player.sendMessage(_plugin.getStrings().getNotOnTeleporter());
                         return false;
                     }
                     if(!t.getTeleportGroup().getOwnerUUID().equals(player.getUniqueId())) {
@@ -109,7 +108,7 @@ public class CommandHandler implements CommandExecutor {
                 if(args[0].equals("listeditors")) {
                     Teleport t = _plugin.getTeleporterData().getTeleportOnLocation(player.getLocation());
                     if(t == null) {
-                        player.sendMessage("You are not standing on any teleport!");
+                        player.sendMessage(_plugin.getStrings().getNotOnTeleporter());
                         return false;
                     }
                     if(!t.getTeleportGroup().getOwnerUUID().equals(player.getUniqueId())) {

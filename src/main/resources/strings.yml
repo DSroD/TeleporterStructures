@@ -1,5 +1,6 @@
 notEnoughFuel: Not enough fuel!
 teleporterAtDestinationBroken: Teleport at chosen destination is broken!
+teleporterHereBroken: This teleport is broken!
 fuel: Fuel
 fuelCost: Fuel cost
 currentFuel: Current fuel
@@ -7,6 +8,9 @@ maxFuel: Maximum fuel
 costModifier: Cost modifier
 distanceModifier: Distance modifier
 maxDistance: Maximal distance
+
+notAllowed: You are not allowed to do this.
+notOnTeleporter: You are not standing on any teleporter.
 
 fuelInvName: Add Fuel
 

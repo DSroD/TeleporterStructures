@@ -15,17 +15,71 @@ public class StringData {
 
     private final TeleportStructures _plugin;
 
-    public String notEnoughFuel;
-    public String teleporterAtDestinationBroken;
-    public String fuel;
-    public String fuelCost;
-    public String currentFuel;
-    public String maxFuel;
-    public String costModifier;
-    public String distanceModifier;
-    public String maxDistance;
-    public String fuelInvName;
+    private String notEnoughFuel;
+    public String getNotEnoughFuel() {
+        return notEnoughFuel;
+    }
+
+    private String teleporterAtDestinationBroken;
+    public String getTeleporterAtDestinationBroken() {
+        return teleporterAtDestinationBroken;
+    }
+
+    private String teleporterHereBroken;
+    public String getTeleporterHereBroken() {
+        return teleporterHereBroken;
+    }
+    private String fuel;
+    public String getFuel() {
+        return fuel;
+    }
+
+    private String fuelCost;
+    public String getFuelCost() {
+        return fuelCost;
+    }
+
+    private String currentFuel;
+    public String getCurrentFuel() {
+        return currentFuel;
+    }
+
+    private String maxFuel;
+    public String getMaxFuel() {
+        return maxFuel;
+    }
     
+    private String costModifier;
+    public String getCostModifier() {
+        return costModifier;
+    }
+
+    private String distanceModifier;
+    public String getDistanceModifier() {
+        return distanceModifier;
+    }
+
+    private String fuelInvName;
+    public String getFuelInvName() {
+        return fuelInvName;
+    }
+
+    private String maxDistance;
+    public String getMaxDistance() {
+        return maxDistance;
+    }
+
+    private String notOnTeleporter;
+    public String getNotOnTeleporter() {
+        return notOnTeleporter;
+    }
+
+    private String notAllowed;
+    
+    public String getNotAllowed() {
+        return notAllowed;
+    }
+
     public final List<String> signWrongName;
     public final List<String> signNameInUse;
     public final List<String> signInvalidStructure;
@@ -59,6 +113,7 @@ public class StringData {
     public void loadStrings() {
         notEnoughFuel = _strings.getString("notEnoughFuel", "Not enough fuel!");
         teleporterAtDestinationBroken = _strings.getString("teleporterAtDestinationBroken", "Teleport at chosen destination is broken!");
+        teleporterHereBroken = _strings.getString("teleporterHereBroken", "Teleport is broken!");
         fuel = _strings.getString("fuel", "Fuel");
         fuelCost = _strings.getString("fuelCost", "Fuel cost");
         currentFuel = _strings.getString("currentFuel", "Current fuel");
@@ -67,6 +122,10 @@ public class StringData {
         distanceModifier = _strings.getString("distanceModifier", "Distance modifier");
         maxDistance = _strings.getString("maxDistance", "Maximal distance");
         fuelInvName = _strings.getString("fuelInvName", "Add Fuel");
+        notAllowed = _strings.getString("notAllowed", "You are not allowed to do this.");
+        notOnTeleporter = _strings.getString("notOnTeleporter", "You are not standing on any teleporter");
+        
+
 
         signWrongName.clear();
         signWrongName.addAll(_strings.getStringList("signWrongName"));

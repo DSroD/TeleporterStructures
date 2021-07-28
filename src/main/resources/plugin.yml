@@ -1,8 +1,8 @@
 name: TeleportStructures
 version: ${project.version}
 main: cz.cuni.mff.rodd.teleportstructures.TeleportStructures
-api-version: 1.13
-authors: [rodd]
+api-version: 1.16
+author: DSroD
 description: Teleporter structures
 commands:
   telestruct:
